@@ -1,0 +1,282 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+
+:root {
+  /* Midnight Glass Base */
+  --bg-top: #050814;
+  --bg-bottom: #0a0d1f;
+  --ink: #ffffff;
+  --muted: #8a9fc2;
+  --accent: #b53cff; /* Neon Purple */
+  --accent-strong: #d83bd2; /* Lighter Purple */
+  --accent-teal: #00e5ff; /* Electric Cyan */
+  --accent-violet: #8e24aa;
+  
+  --outline: rgba(255, 255, 255, 0.08); /* Subtle white outline */
+  --glass: rgba(12, 16, 33, 0.65); /* Deep translucent navy */
+  --glass-hover: rgba(22, 28, 55, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --shadow-glow: 0 0 24px rgba(181, 60, 255, 0.5); /* Purple neon glow */
+}
+
+body, html, #root {
+  font-family: 'Outfit', sans-serif !important;
+  color: var(--ink) !important;
+  background-color: var(--bg-top) !important;
+  background: radial-gradient(circle at top right, #0a0d1f 0%, #050814 50%, #010207 100%) !important;
+  min-height: 100vh;
+}
+
+/* Clear transparent backgrounds and meshes to allow glowing orbs background */
+.hero-bg::before, .mesh-bg::before, .login-scene-bg, .role-scene-bg, .login-visual-column, .role-visual-column, .campus-building, .campus-glow {
+  background: transparent !important;
+}
+
+/* Ensure pages have transparent background */
+.page, .home-page, .admin-dashboard-page, .admin-role-requests-page, .common-dashboard-bg, .pending-request-bg, .dashboard-container, main, .layout-content, .external-dashboard-bg, .external-dashboard-container, .features-section, .roles-section, .cta-section, .home-footer, section, footer {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Shifting Glowing Orbs - Midnight Glass */
+.midnight-bg {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  overflow: hidden;
+  z-index: -20;
+  background: #050814;
+}
+
+.midnight-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.45;
+  animation: float-midnight 25s infinite alternate ease-in-out;
+}
+
+.glow-1 {
+  width: 700px; height: 700px;
+  background: var(--accent-teal);
+  top: -150px; left: -150px;
+  animation-delay: 0s;
+}
+
+.glow-2 {
+  width: 800px; height: 800px;
+  background: var(--accent);
+  bottom: -200px; right: -200px;
+  animation-delay: -7s;
+}
+
+.glow-3 {
+  width: 600px; height: 600px;
+  background: #0051ff; /* Deep electric blue */
+  top: 30%; left: 40%;
+  animation-delay: -14s;
+}
+
+@keyframes float-midnight {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(120px, 180px) scale(1.1); }
+  100% { transform: translate(-80px, 120px) scale(0.9); }
+}
+
+/* Glass Cards */
+.glass-card, .login-split-card, .role-split-card, .info-card, .status-card, .feature-card, .role-card, .stat-card, .request-item, .request-details, .booking-card, .resource-card, .pending-request-card, .user-sidebar, .dashboard-sidebar {
+  background: var(--glass) !important;
+  border: 1px solid var(--glass-border) !important;
+  backdrop-filter: blur(24px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
+  color: #fff !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255,255,255,0.1) !important;
+  border-radius: 24px !important;
+}
+
+/* Floating Navbar */
+.dashboard-navbar, .home-navbar, .user-nav {
+  background: rgba(8, 12, 28, 0.75) !important;
+  border: 1px solid var(--glass-border) !important;
+  backdrop-filter: blur(24px) !important;
+  color: #fff !important;
+  border-radius: 100px !important;
+  margin: 20px auto !important;
+  width: 95% !important;
+  max-width: 1400px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+  top: 15px !important;
+  position: sticky !important;
+  z-index: 100 !important;
+}
+
+/* Ensure the parent header doesn't break floating constraints */
+header {
+  background: transparent !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.home-navbar .logo-text, .user-nav-brand span {
+  background: linear-gradient(135deg, var(--accent-teal), var(--accent)) !important;
+  background-clip: text !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* Text Gradients */
+.hero-title, .login-main-title, .role-main-title, .section-title, h1, h2 {
+  background: linear-gradient(135deg, #ffffff 10%, var(--accent-teal) 90%) !important;
+  background-clip: text !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  line-height: 1.2 !important;
+}
+
+/* Gradient Buttons */
+.cta-btn, .btn-primary, .role-continue-btn, .google-signin-btn, .navbar-login-btn, .hero-cta-btn, .btn-approve {
+  background: linear-gradient(135deg, var(--accent), #7600ff) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  box-shadow: var(--shadow-glow) !important;
+  font-family: 'Outfit', sans-serif !important;
+  font-weight: 800 !important;
+  border-radius: 100px !important; /* Pill shapes for neon feel */
+  transition: all 0.3s ease !important;
+}
+
+.cta-btn:hover, .btn-primary:hover, .role-continue-btn:hover, .google-signin-btn:hover, .hero-cta-btn:hover, .btn-approve:hover, .navbar-login-btn:hover {
+  filter: brightness(1.25) !important;
+  box-shadow: 0 0 30px rgba(0, 229, 255, 0.7) !important;
+  transform: translateY(-2px) !important;
+}
+
+.cta-btn.secondary, .btn-secondary, .role-option-btn, .btn-neutral, .user-nav-link {
+  background: rgba(255,255,255,0.06) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
+  border-radius: 100px !important;
+  transition: all 0.3s ease !important;
+}
+
+.cta-btn.secondary:hover, .btn-secondary:hover, .user-nav-link:hover {
+  background: rgba(255,255,255,0.15) !important;
+  transform: translateY(-1px) !important;
+}
+
+.btn-reject {
+  background: linear-gradient(135deg, rgba(255,50,50,0.8), rgba(200,0,0,0.8)) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 100px !important;
+}
+
+/* Email Sign In specific overrides */
+.email-login-btn {
+  background: linear-gradient(135deg, var(--accent), #7600ff) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  box-shadow: var(--shadow-glow) !important;
+  border-radius: 100px !important;
+  padding: 14px 28px !important;
+  width: 100% !important;
+  font-family: 'Outfit', sans-serif !important;
+  font-weight: 800 !important;
+  transition: all 0.3s ease !important;
+}
+.email-login-btn:hover {
+  filter: brightness(1.25) !important;
+  box-shadow: 0 0 30px rgba(0, 229, 255, 0.7) !important;
+  transform: translateY(-2px) !important;
+}
+.login-eyebrow {
+  color: var(--accent-teal) !important;
+}
+
+/* Nav Links */
+.user-nav-link.active {
+  background: rgba(0, 229, 255, 0.2) !important;
+  border-color: var(--accent-teal) !important;
+  color: var(--accent-teal) !important;
+}
+
+/* Typography Specifics */
+p, span, div, label {
+  color: rgba(255,255,255,0.85); /* Readability vs pure black */
+}
+b, strong {
+  color: #fff !important;
+}
+
+.role-option-title {
+  color: #fff !important;
+}
+
+/* Forms & Inputs */
+.form-input, .rejection-textarea, input, select, textarea {
+  background: rgba(12, 16, 33, 0.5) !important;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  color: #fff !important;
+  border-radius: 16px !important;
+  padding: 12px 16px !important;
+  transition: all 0.3s ease !important;
+}
+.form-input:focus, .rejection-textarea:focus, input:focus, select:focus, textarea:focus {
+  border-color: var(--accent-teal) !important;
+  box-shadow: 0 0 16px rgba(0, 229, 255, 0.3) !important;
+  outline: none !important;
+}
+.form-input::placeholder {
+  color: rgba(255,255,255,0.4) !important;
+}
+
+/* Mode Tabs */
+.mode-tab {
+  background: transparent !important;
+  color: rgba(255,255,255,0.6) !important;
+  border: 1px solid transparent !important;
+  border-radius: 100px !important;
+  transition: all 0.3s ease !important;
+}
+.mode-tab.active {
+  background: rgba(255,255,255,0.15) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,0.3) !important;
+}
+
+/* Badges */
+.role-badge, .badge, .status-badge {
+  background: rgba(255,255,255,0.1) !important;
+  border: 1px solid rgba(255,255,255,0.3) !important;
+  color: #fff !important;
+  border-radius: 100px !important;
+}
+
+/* Sub-elements inside cards specific to Midnight glass */
+.role-option-btn {
+  background: rgba(12, 16, 33, 0.8) !important;
+  border-radius: 16px !important;
+  padding: 16px !important;
+}
+.role-option-btn.active {
+  background: rgba(181, 60, 255, 0.2) !important;
+  border-color: var(--accent) !important;
+  box-shadow: inset 0 0 20px rgba(181, 60, 255, 0.3) !important;
+}
+
+/* Specific component fixes for layout shifts */
+.dashboard-header {
+  background: transparent !important;
+}
+.user-sidebar {
+  border-radius: 24px !important;
+  margin-right: 20px !important;
+  height: calc(100vh - 40px) !important;
+}
+
+/* Icons Fixes */
+.icon-btn {
+  background: rgba(255,255,255,0.1) !important;
+  color: #fff !important;
+}
+.icon-btn:hover {
+  background: rgba(255,255,255,0.2) !important;
+}
