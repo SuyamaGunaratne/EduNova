@@ -69,7 +69,6 @@ export default function HomePage() {
         <div className="hero-bg"></div>
       </section>
 
-      Features Section
       <section className="features-section">
         <div className="features-container">
           <h2 className="section-title">Why Choose Smart Campus HUB?</h2>
@@ -148,11 +147,6 @@ export default function HomePage() {
               <div className="role-icon">🔧</div>
               <h3>Technician</h3>
               <p>Handle support tickets, manage resources, and maintain campus systems</p>
-            </div>
-            <div className="role-card">
-              <div className="role-icon">👨‍💼</div>
-              <h3>Administrator</h3>
-              <p>Oversee all operations, manage users, and control system settings</p>
             </div>
             <div className="role-card">
               <div className="role-icon">🌐</div>
