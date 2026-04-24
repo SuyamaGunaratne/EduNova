@@ -6,7 +6,6 @@ import com.smart_campus_operations_hub.hello_hub.dto.RoleSelectionRequest;
 import com.smart_campus_operations_hub.hello_hub.dto.UserDto;
 import com.smart_campus_operations_hub.hello_hub.model.AppUser;
 import com.smart_campus_operations_hub.hello_hub.model.RoleRequest;
-import com.smart_campus_operations_hub.hello_hub.service.JwtService;
 import com.smart_campus_operations_hub.hello_hub.service.RoleRequestService;
 import com.smart_campus_operations_hub.hello_hub.service.UserMapper;
 import com.smart_campus_operations_hub.hello_hub.service.UserService;
@@ -31,7 +30,6 @@ public class AuthController {
 
     private final UserService userService;
     private final UserMapper userMapper;
-    private final JwtService jwtService;
     private final RoleRequestService roleRequestService;
 
     @GetMapping("/me")

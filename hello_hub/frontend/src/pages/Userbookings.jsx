@@ -1,9 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import api from "../api/axiosClient";
 
 export default function Userbookings() {
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
-    resource: "",
+    resourceId: "",
+    resourceName: "",
     date: "",
     startTime: "",
     endTime: "",
@@ -11,217 +15,269 @@ export default function Userbookings() {
     attendees: "",
   });
 
-  // Mock data for existing user bookings
-  const [bookings, setBookings] = useState([
-    {
-      id: 1,
-      resource: "Conference Room A",
-      date: "2026-04-10",
-      startTime: "10:00",
-      endTime: "12:00",
-      status: "APPROVED",
-    },
-    {
-      id: 2,
-      resource: "Projector B",
-      date: "2026-04-12",
-      startTime: "14:00",
-      endTime: "16:00",
-      status: "PENDING",
-    },
-  ]);
+  const [bookings, setBookings] = useState([]);
+  const [resources, setResources] = useState([]);
+
+  // Predefined list of suitable campus resources for better UX
+  const defaultResources = [
+    { id: "res1", name: "Computer Lab 01 (Advanced Computing)", type: "LAB", status: "AVAILABLE" },
+    { id: "res2", name: "Computer Lab 02 (Network & Security)", type: "LAB", status: "AVAILABLE" },
+    { id: "res3", name: "Main Auditorium (East Wing)", type: "HALL", status: "AVAILABLE" },
+    { id: "res4", name: "Seminar Room A (Management Block)", type: "ROOM", status: "AVAILABLE" },
+    { id: "res5", name: "Digital Library (Zone 4)", type: "SPACE", status: "AVAILABLE" },
+    { id: "res6", name: "Smart Classroom 102", type: "ROOM", status: "AVAILABLE" },
+    { id: "res7", name: "IoT Innovation Lab", type: "LAB", status: "BROKEN" },
+    { id: "res8", name: "Projector Hub - Mobile Unit B", type: "DEVICE", status: "AVAILABLE" },
+  ];
+
+  useEffect(() => {
+    fetchBookings();
+    fetchResources();
+  }, []);
+
+  const fetchBookings = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get("/api/bookings/my");
+      setBookings(res.data);
+    } catch (err) {
+      console.error("Failed to fetch bookings:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchResources = async () => {
+    try {
+      const res = await api.get("/api/resources");
+      // Use API resources if available, else fallback to default for UI demo
+      setResources(res.data.length > 0 ? res.data : defaultResources);
+    } catch (err) {
+      console.error("Failed to fetch resources:", err);
+      setResources(defaultResources);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === "resource") {
+        const selectedResource = resources.find(r => r.id === value);
+        setFormData(prev => ({ 
+            ...prev, 
+            resourceId: value, 
+            resourceName: selectedResource ? selectedResource.name : ""
+        }));
+    } else {
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newBooking = {
-      id: Date.now(),
-      ...formData,
-      status: "PENDING",
-    };
-    setBookings([newBooking, ...bookings]);
-    setShowModal(false);
-    setFormData({ resource: "", date: "", startTime: "", endTime: "", purpose: "", attendees: "" });
+    setError("");
+    try {
+      await api.post("/api/bookings", {
+          ...formData,
+          attendees: parseInt(formData.attendees) || 0
+      });
+      fetchBookings();
+      setShowModal(false);
+      setFormData({ resourceId: "", resourceName: "", date: "", startTime: "", endTime: "", purpose: "", attendees: "" });
+    } catch (err) {
+      let msg = err.response?.data?.message || "TIME SLOT HAS ALREADY BOOKED";
+      if (msg.toLowerCase().includes("unexpected server error")) {
+        msg = "TIME SLOT HAS ALREADY BOOKED";
+      }
+      setError(msg.toUpperCase());
+    }
   };
 
-  const handleCancel = (id) => {
-    setBookings(bookings.map(b => b.id === id ? { ...b, status: 'CANCELLED' } : b));
+  const handleCancel = async (id) => {
+    if (!window.confirm("ARE YOU SURE YOU WANT TO CANCEL THIS RESERVATION?")) return;
+    try {
+      await api.delete(`/api/bookings/${id}`);
+      fetchBookings();
+    } catch (err) {
+      console.error("Failed to cancel booking:", err);
+      alert("FAILED TO CANCEL RESERVATION");
+    }
+  };
+
+  const getResourceIcon = (type) => {
+    switch (type) {
+      case 'LAB': return '🖥️';
+      case 'HALL': return '🏛️';
+      case 'ROOM': return '🏫';
+      case 'SPACE': return '📚';
+      case 'DEVICE': return '📹';
+      default: return '📍';
+    }
   };
 
   return (
-    <div className="page mesh-bg">
+    <div className="page mesh-bg dashboard-fade-in">
       <div className="dashboard-shell">
-        <div className="dashboard-header">
-          <div>
-            <h1>My Bookings</h1>
-            <p>Request and manage your resource bookings.</p>
+        <div className="dashboard-header-container">
+          <div className="dashboard-title-group">
+            <h1 className="premium-title">Resource Hub</h1>
+            <p className="premium-subtitle">Manage your campus facility reservations and equipment usage.</p>
+            <button className="premium-cta-btn" onClick={() => setShowModal(true)}>
+              <div className="btn-content">
+                <span className="plus-icon">+</span>
+                <span>Reserve Space</span>
+              </div>
+            </button>
           </div>
-          <button className="cta-btn" onClick={() => setShowModal(true)}>
-            + New Booking
-          </button>
         </div>
 
-        <div className="glass-card" style={{ width: "100%", marginTop: "20px" }}>
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div className="premium-glass-card table-section slide-up">
+          <div className="section-header">
+            <div className="header-dot"></div>
+            <h3>Recent Bookings</h3>
+          </div>
+          <div className="table-container">
+            <table className="premium-table">
               <thead>
-                <tr style={{ textAlign: "left", borderBottom: "1px solid var(--outline)" }}>
-                  <th style={{ padding: "12px" }}>Resource</th>
-                  <th style={{ padding: "12px" }}>Date</th>
-                  <th style={{ padding: "12px" }}>Time Slot</th>
-                  <th style={{ padding: "12px" }}>Status</th>
-                  <th style={{ padding: "12px" }}>Actions</th>
+                <tr>
+                  <th>Resource / Lab</th>
+                  <th>Scheduled Date</th>
+                  <th>Time Slot</th>
+                  <th>Status</th>
+                  <th className="text-center">Manage</th>
                 </tr>
               </thead>
               <tbody>
                 {bookings.map((booking) => (
-                  <tr key={booking.id} style={{ borderBottom: "1px solid var(--outline)" }}>
-                    <td style={{ padding: "12px" }}>{booking.resource}</td>
-                    <td style={{ padding: "12px" }}>{booking.date}</td>
-                    <td style={{ padding: "12px" }}>
-                      {booking.startTime} - {booking.endTime}
+                  <tr key={booking.id} className="premium-row">
+                    <td>
+                      <div className="resource-cell">
+                        <div className="resource-icon-box">
+                          {getResourceIcon(resources.find(r => r.name === booking.resourceName)?.type)}
+                        </div>
+                        <span className="resource-name">{booking.resourceName}</span>
+                      </div>
                     </td>
-                    <td style={{ padding: "12px" }}>
-                      <span
-                        className={`badge ${booking.status.toLowerCase()}`}
-                        style={{
-                          padding: "4px 8px",
-                          borderRadius: "6px",
-                          fontSize: "12px",
-                          fontWeight: "bold",
-                          backgroundColor:
-                            booking.status === "APPROVED"
-                              ? "#e6f4ea"
-                              : booking.status === "PENDING"
-                              ? "#fff4e5"
-                              : "#fce8e6",
-                          color:
-                            booking.status === "APPROVED"
-                              ? "#1e7e34"
-                              : booking.status === "PENDING"
-                              ? "#b45d00"
-                              : "#d93025",
-                        }}
-                      >
+                    <td><span className="date-tag">{booking.date}</span></td>
+                    <td>
+                      <div className="slot-pill">
+                        {booking.startTime} — {booking.endTime}
+                      </div>
+                    </td>
+                    <td>
+                      <span className={`status-pill ${booking.status.toLowerCase()}`}>
                         {booking.status}
                       </span>
                     </td>
-                    <td style={{ padding: "12px" }}>
-                      {booking.status === "APPROVED" && (
+                    <td className="text-center">
+                      {booking.status === "APPROVED" || booking.status === "PENDING" ? (
                         <button 
-                          className="user-nav-link" 
-                          style={{ color: "#d93025", padding: "4px 8px" }}
+                          className="cancel-icon-btn"
                           onClick={() => handleCancel(booking.id)}
+                          title="Cancel Reservation"
                         >
-                          Cancel
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M18 6L6 18M6 6l12 12"></path>
+                          </svg>
                         </button>
+                      ) : (
+                        <span className="dimmed-text">—</span>
                       )}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            {bookings.length === 0 && !loading && (
+              <div className="empty-state">
+                <div className="empty-icon">🗓️</div>
+                <h4>No active reservations</h4>
+                <p>Click the button above to reserve a lab or resource.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       {showModal && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            backgroundColor: "rgba(0,0,0,0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000,
-            backdropFilter: "blur(4px)",
-          }}
-        >
-          <div className="glass-card" style={{ maxWidth: "500px" }}>
-            <h2>Request Booking</h2>
-            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "16px" }}>
-              <div>
-                <label style={{ display: "block", marginBottom: "4px", fontSize: "14px", fontWeight: "600" }}>Resource</label>
-                <select 
-                  name="resource" 
-                  className="role-chip" 
-                  style={{ width: "100%" }} 
-                  required 
-                  onChange={handleInputChange}
-                  value={formData.resource}
-                >
-                  <option value="">Select a resource</option>
-                  <option value="Conference Room A">Conference Room A</option>
-                  <option value="Projector B">Projector B</option>
-                  <option value="Lab 101">Lab 101</option>
-                </select>
+        <div className="premium-modal-overlay">
+          <div className="premium-modal-card">
+            <div className="modal-top-bar">
+              <div className="modal-icon">✨</div>
+              <div className="modal-titles">
+                <h2>New Reservation</h2>
+                <p>Please fill in the details for your booking request.</p>
               </div>
-              <div>
-                <label style={{ display: "block", marginBottom: "4px", fontSize: "14px", fontWeight: "600" }}>Date</label>
-                <input 
-                  type="date" 
-                  name="date" 
-                  style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid var(--outline)" }} 
-                  required 
-                  onChange={handleInputChange}
-                  value={formData.date}
-                />
+              <button className="modal-close-btn" onClick={() => setShowModal(false)}>✕</button>
+            </div>
+            
+            {error && (
+              <div className="premium-error-banner">
+                <span className="error-icon">⚠️</span>
+                <p>{error}</p>
               </div>
-              <div style={{ display: "flex", gap: "10px" }}>
-                <div style={{ flex: 1 }}>
-                  <label style={{ display: "block", marginBottom: "4px", fontSize: "14px", fontWeight: "600" }}>Start Time</label>
-                  <input 
-                    type="time" 
-                    name="startTime" 
-                    style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid var(--outline)" }} 
+            )}
+            
+            <form onSubmit={handleSubmit} className="premium-form">
+              <div className="form-row full">
+                <label>Select Resource</label>
+                <div className="custom-select">
+                  <select 
+                    name="resource" 
                     required 
                     onChange={handleInputChange}
-                    value={formData.startTime}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label style={{ display: "block", marginBottom: "4px", fontSize: "14px", fontWeight: "600" }}>End Time</label>
-                  <input 
-                    type="time" 
-                    name="endTime" 
-                    style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid var(--outline)" }} 
-                    required 
-                    onChange={handleInputChange}
-                    value={formData.endTime}
-                  />
+                    value={formData.resourceId}
+                  >
+                    <option value="">Choose a lab or equipment...</option>
+                    {resources.map(r => (
+                      <option key={r.id} value={r.id} disabled={r.status === "BROKEN"}>
+                        {getResourceIcon(r.type)} {r.name} {r.status === "BROKEN" ? "— [In Maintenance]" : ""}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
-              <div>
-                <label style={{ display: "block", marginBottom: "4px", fontSize: "14px", fontWeight: "600" }}>Purpose</label>
+
+              <div className="form-grid-3">
+                <div className="form-row">
+                  <label>Date</label>
+                  <input type="date" name="date" required onChange={handleInputChange} value={formData.date} />
+                </div>
+                <div className="form-row">
+                  <label>Start Time</label>
+                  <input type="time" name="startTime" required onChange={handleInputChange} value={formData.startTime} />
+                </div>
+                <div className="form-row">
+                  <label>End Time</label>
+                  <input type="time" name="endTime" required onChange={handleInputChange} value={formData.endTime} />
+                </div>
+              </div>
+
+              <div className="form-row full">
+                <label>Purpose of Use</label>
                 <textarea 
                   name="purpose" 
-                  rows="3" 
-                  style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid var(--outline)" }} 
+                  rows="2" 
                   required 
-                  placeholder="Reason for booking..."
+                  placeholder="Tell us what you'll be using this resource for..."
                   onChange={handleInputChange}
                   value={formData.purpose}
                 ></textarea>
               </div>
-              <div>
-                <label style={{ display: "block", marginBottom: "4px", fontSize: "14px", fontWeight: "600" }}>Attendees (if applicable)</label>
+
+              <div className="form-row">
+                <label>Total Attendees</label>
                 <input 
                   type="number" 
                   name="attendees" 
-                  style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid var(--outline)" }} 
-                  placeholder="Approximate count"
+                  placeholder="e.g. 15"
                   onChange={handleInputChange}
                   value={formData.attendees}
                 />
               </div>
-              <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
-                <button type="submit" className="cta-btn" style={{ flex: 1 }}>Submit Request</button>
-                <button type="button" className="cta-btn secondary" style={{ flex: 1 }} onClick={() => setShowModal(false)}>Cancel</button>
+
+              <div className="form-actions">
+                <button type="submit" className="submit-btn">Submit Request</button>
+                <button type="button" className="cancel-btn" onClick={() => setShowModal(false)}>Cancel</button>
               </div>
             </form>
           </div>

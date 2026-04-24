@@ -1,50 +1,42 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import api from "../api/axiosClient";
 
 export default function AdminBookings() {
   const [filter, setFilter] = useState("ALL");
-  const [bookings, setBookings] = useState([
-    {
-      id: 1,
-      user: "John Doe",
-      resource: "Conference Room A",
-      date: "2026-04-10",
-      startTime: "10:00",
-      endTime: "12:00",
-      status: "PENDING",
-      purpose: "Project Kick-off Meeting",
-      attendees: 10,
-    },
-    {
-      id: 2,
-      user: "Jane Smith",
-      resource: "Lab 101",
-      date: "2026-04-11",
-      startTime: "09:00",
-      endTime: "11:00",
-      status: "APPROVED",
-      purpose: "Practical Session",
-      attendees: 15,
-    },
-    {
-      id: 3,
-      user: "Mike Johnson",
-      resource: "Projector B",
-      date: "2026-04-12",
-      startTime: "14:00",
-      endTime: "15:00",
-      status: "REJECTED",
-      purpose: "Presentation",
-      attendees: 5,
-    },
-  ]);
+  const [loading, setLoading] = useState(true);
+  const [bookings, setBookings] = useState([]);
+
+  useEffect(() => {
+    fetchBookings();
+  }, []);
+
+  const fetchBookings = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get("/api/bookings");
+      setBookings(res.data);
+    } catch (err) {
+      console.error("Failed to fetch bookings:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [reason, setReason] = useState("");
 
-  const handleAction = (id, newStatus) => {
-    setBookings(bookings.map((b) => (b.id === id ? { ...b, status: newStatus, rejectionReason: reason } : b)));
-    setSelectedBooking(null);
-    setReason("");
+  const handleAction = async (id, newStatus) => {
+    try {
+      await api.put(`/api/bookings/${id}/status`, {
+        status: newStatus,
+        reason: reason
+      });
+      fetchBookings();
+      setSelectedBooking(null);
+      setReason("");
+    } catch (err) {
+      console.error("Failed to update booking status:", err);
+    }
   };
 
   const filteredBookings = bookings.filter((b) => filter === "ALL" || b.status === filter);
@@ -87,9 +79,9 @@ export default function AdminBookings() {
                 {filteredBookings.map((booking) => (
                   <tr key={booking.id} style={{ borderBottom: "1px solid var(--outline)" }}>
                     <td style={{ padding: "12px" }}>
-                      <strong>{booking.user}</strong>
+                      <strong>{booking.userName}</strong>
                     </td>
-                    <td style={{ padding: "12px" }}>{booking.resource}</td>
+                    <td style={{ padding: "12px" }}>{booking.resourceName}</td>
                     <td style={{ padding: "12px" }}>
                       {booking.date} {booking.startTime} - {booking.endTime}
                     </td>
@@ -106,12 +98,16 @@ export default function AdminBookings() {
                               ? "#e6f4ea"
                               : booking.status === "PENDING"
                               ? "#fff4e5"
+                              : booking.status === "CANCELLED"
+                              ? "#f3f4f6"
                               : "#fce8e6",
                           color:
                             booking.status === "APPROVED"
                               ? "#1e7e34"
                               : booking.status === "PENDING"
                               ? "#b45d00"
+                              : booking.status === "CANCELLED"
+                              ? "#6b7280"
                               : "#d93025",
                         }}
                       >
@@ -151,8 +147,8 @@ export default function AdminBookings() {
           <div className="glass-card" style={{ maxWidth: "500px" }}>
             <h2>Review Booking Request</h2>
             <div style={{ marginTop: "16px", marginBottom: "16px" }}>
-              <p>Requested by: <strong>{selectedBooking.user}</strong></p>
-              <p>Target Resource: <strong>{selectedBooking.resource}</strong></p>
+              <p>Requested by: <strong>{selectedBooking.userName}</strong></p>
+              <p>Target Resource: <strong>{selectedBooking.resourceName}</strong></p>
               <p>Purpose: {selectedBooking.purpose}</p>
               <p>Attendees: {selectedBooking.attendees || "N/A"}</p>
             </div>

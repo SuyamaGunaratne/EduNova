@@ -53,9 +53,15 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.NOT_FOUND, "Resource not found", req, List.of(ex.getMessage()));
     }
 
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ApiErrorResponse> handleRuntimeException(RuntimeException ex, HttpServletRequest req) {
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), req, List.of());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleUnexpected(Exception ex, HttpServletRequest req) {
-        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected server error", req, List.of(ex.getMessage()));
+        String message = ex.getMessage() != null ? ex.getMessage() : "An unexpected error occurred";
+        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, message, req, List.of());
     }
 
     private ResponseEntity<ApiErrorResponse> buildError(HttpStatus status,
