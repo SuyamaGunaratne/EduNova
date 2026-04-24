@@ -19,8 +19,9 @@ export default function CommonUserDashboard() {
   }, [token, user, navigate]);
 
   const handleLogout = () => {
-    logout();
-    navigate("/", { replace: true });
+    if (logout()) {
+      navigate("/", { replace: true });
+    }
   };
 
   const handleRequestRole = () => {
