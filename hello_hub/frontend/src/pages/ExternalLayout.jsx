@@ -1,33 +1,36 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import Topbar from "../components/Topbar";
 
 export default function ExternalLayout() {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();
-    navigate("/", { replace: true });
+    if (logout()) {
+      navigate("/", { replace: true });
+    }
   };
 
   return (
-    <div className="page external-dashboard-bg" style={{ minHeight: "100vh" }}>
-      <nav className="dashboard-navbar">
-        <div className="navbar-container">
-          <div className="navbar-brand">
+    <div className="dashboard-layout">
+      <div className="dashboard-sidebar-container">
+        <nav className="external-sidebar">
+          <div className="sidebar-brand">
             <span className="brand-icon">🌐</span>
-            <span className="brand-text">Smart Campus - External Portal</span>
+            <span className="brand-text">External Portal</span>
           </div>
-          <div className="navbar-actions">
-            <button className="btn-neutral" onClick={handleLogout}>
-              Logout
-            </button>
+          <div className="sidebar-actions">
+            {/* Action buttons if needed, Topbar handles logout */}
           </div>
-        </div>
-      </nav>
+        </nav>
+      </div>
       
-      <main className="layout-content">
-        <Outlet />
+      <main className="dashboard-main-content">
+        <Topbar />
+        <div className="dashboard-content-wrapper">
+          <Outlet />
+        </div>
       </main>
     </div>
   );

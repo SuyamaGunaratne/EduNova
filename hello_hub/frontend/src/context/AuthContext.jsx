@@ -55,13 +55,18 @@ export function AuthProvider({ children }) {
     localStorage.setItem("token", newToken);
   };
 
-  const logout = () => {
+  const logout = (confirmLogout = true) => {
+    if (confirmLogout && !window.confirm("Are you sure you want to log out of the system?")) {
+      return false;
+    }
+
     setToken("");
     setUser(null);
     setRoleRequest(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("roleRequest");
+    return true;
   };
 
   const value = useMemo(

@@ -90,8 +90,9 @@ export default function PendingRoleRequestPage() {
     if (pollingIntervalRef.current) {
       clearInterval(pollingIntervalRef.current);
     }
-    logout();
-    navigate("/", { replace: true });
+    if (logout()) {
+      navigate("/", { replace: true });
+    }
   };
 
   return (
