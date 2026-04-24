@@ -9,7 +9,7 @@ export default function UserNavbar({ activeMenu }) {
 
   const roleRoot = user?.role?.toLowerCase() === "lecturer" ? "/lecturer" : "/student";
   const lastPathSegment = location.pathname.split("/").filter(Boolean).pop();
-  const resolvedActiveMenu = activeMenu || (lastPathSegment === "resources" || lastPathSegment === "bookings" || lastPathSegment === "tickets" || lastPathSegment === "notifications" ? lastPathSegment : "home");
+  const resolvedActiveMenu = activeMenu || (lastPathSegment === "resources" || lastPathSegment === "bookings" || lastPathSegment === "tickets" ? lastPathSegment : "home");
 
   const navLinkClass = (menuKey) =>
     `user-nav-link${resolvedActiveMenu === menuKey ? " active" : ""}`;

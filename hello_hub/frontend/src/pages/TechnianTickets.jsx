@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import api from '../api/axiosClient';
 
 export default function TechnianTickets() {
-  // Mock data as requested: "ONLY displaying tickets assigned to technician after admin assigns"
   const [tickets, setTickets] = useState([
     {
       id: "T-1001",
@@ -24,17 +23,53 @@ export default function TechnianTickets() {
     }
   ]);
 
+  const technicianStats = [
+    { name: "Assigned Tickets", value: tickets.length, icon: "🧰" },
+    { name: "High Priority", value: tickets.filter(t => t.priority === "HIGH").length, icon: "🔥" },
+    { name: "Open Alerts", value: 4, icon: "🚨" },
+    { name: "Resources Online", value: 76, icon: "🔌" },
+  ];
+
+  const quickActions = [
+    { label: "New Inspection", link: "/technician/tickets" },
+    { label: "My Schedule", link: "/technician/schedule" },
+    { label: "Submit Report", link: "/technician/report" },
+    { label: "Team Updates", link: "/technician/tickets" },
+  ];
+
   return (
     <div className="page mesh-bg">
       <div className="dashboard-shell">
         <div className="dashboard-header" style={{ marginBottom: "20px" }}>
           <div>
-            <h1>Assigned Tickets</h1>
-            <p>View and manage maintenance tasks for campus resources.</p>
+            <p className="kicker">Technician Command Center</p>
+            <h1>Assigned Maintenance Work</h1>
+            <p>Monitor assigned tickets, update status, and keep campus systems running smoothly.</p>
           </div>
           <div className="glass-card" style={{ padding: "10px 20px", display: "flex", alignItems: "center", gap: "10px" }}>
             <div style={{ width: "12px", height: "12px", borderRadius: "50%", backgroundColor: "#1e7e34" }}></div>
             <span style={{ fontWeight: "600", fontSize: "14px" }}>Technician Online</span>
+          </div>
+        </div>
+
+        <div className="role-grid" style={{ marginBottom: "24px" }}>
+          {technicianStats.map((stat, index) => (
+            <div key={index} className="glass-card" style={{ padding: "24px", height: "100%" }}>
+              <div style={{ fontSize: "22px", marginBottom: "8px" }}>{stat.icon}</div>
+              <p style={{ margin: "0 0 8px", fontSize: "14px", color: "var(--muted)", fontWeight: "600" }}>{stat.name}</p>
+              <div style={{ fontSize: "34px", fontWeight: "800", color: "var(--ink)" }}>{stat.value}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="glass-card" style={{ padding: "30px", marginBottom: "24px" }}>
+          <h2>Quick Actions</h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "16px", marginTop: "20px" }}>
+            {quickActions.map((action, i) => (
+              <a href={action.link} key={i} className="action-card" style={{ display: "block", padding: "18px", borderRadius: "16px", background: "var(--bg-top)", border: "1px solid var(--outline)", textAlign: "center", textDecoration: "none", color: "var(--ink)" }}>
+                <p style={{ margin: 0, fontSize: "15px", fontWeight: 700 }}>{action.label}</p>
+              </a>
+            ))}
           </div>
         </div>
 
@@ -59,8 +94,8 @@ export default function TechnianTickets() {
                 </span>
               </div>
 
-              <div style={{ padding: "12px", backgroundColor: "rgba(255,255,255,0.3)", borderRadius: "8px", border: "1px solid var(--outline)" }}>
-                <p style={{ fontSize: "14px", fontWeight: "500", color: "var(--text)" }}>{ticket.issue}</p>
+              <div style={{ padding: "12px", backgroundColor: "var(--bg-top)", borderRadius: "8px", border: "1px solid var(--outline)" }}>
+                <p style={{ fontSize: "14px", fontWeight: "600", color: "var(--ink)", margin: 0 }}>{ticket.issue}</p>
               </div>
 
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "8px", fontSize: "12px", color: "var(--muted)" }}>

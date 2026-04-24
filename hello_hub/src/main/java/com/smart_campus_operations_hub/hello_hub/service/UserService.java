@@ -46,6 +46,11 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public AppUser getById(String id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
+    }
+
     public List<AppUser> getAllUsers() {
         return userRepository.findAll();
     }

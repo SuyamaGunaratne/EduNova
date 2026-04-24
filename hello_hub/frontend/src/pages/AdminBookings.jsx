@@ -49,13 +49,23 @@ export default function AdminBookings() {
             <h1>Admin Resource Bookings</h1>
             <p>Review and manage all resource booking requests across the campus.</p>
           </div>
-          <div className="user-nav-links" style={{ backgroundColor: "var(--glass)", padding: "10px", borderRadius: "12px", border: "1px solid var(--outline)" }}>
+          <div style={{ display: "inline-flex", background: "rgba(124, 58, 237, 0.08)", border: "1px solid rgba(124, 58, 237, 0.16)", borderRadius: "999px", padding: "6px", gap: "4px" }}>
             {["ALL", "PENDING", "APPROVED", "REJECTED"].map((f) => (
               <button
                 key={f}
-                className={`user-nav-link ${filter === f ? "active" : ""}`}
                 onClick={() => setFilter(f)}
-                style={{ fontSize: "12px" }}
+                style={{
+                  background: filter === f ? "rgba(124, 58, 237, 0.18)" : "transparent",
+                  border: "none",
+                  borderRadius: "999px",
+                  cursor: "pointer",
+                  padding: "10px 16px",
+                  color: filter === f ? "var(--purple)" : "var(--muted)",
+                  fontWeight: 700,
+                  fontSize: "14px",
+                  transition: "all 0.2s ease",
+                  boxShadow: filter === f ? "0 8px 24px rgba(124, 58, 237, 0.08)" : "none",
+                }}
               >
                 {f}
               </button>
