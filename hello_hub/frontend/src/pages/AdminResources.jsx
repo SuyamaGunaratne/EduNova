@@ -61,7 +61,7 @@ export default function AdminResources() {
           </div>
         </div>
 
-        <div className="admin-grid-layout" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 0.8fr", gap: "24px", marginTop: "30px" }}>
+        <div className="admin-grid-layout" style={{ display: "grid", gridTemplateColumns: "1fr 1.5fr 0.8fr", gap: "24px", marginTop: "30px" }}>
           {/* Inventory Section */}
           <div className="premium-glass-card">
             <div className="section-header">
@@ -118,6 +118,8 @@ export default function AdminResources() {
                   <tr>
                     <th>Requester</th>
                     <th>Type</th>
+                    <th>Date</th>
+                    <th>Time Slot</th>
                     <th>Description</th>
                     <th>Action</th>
                   </tr>
@@ -125,24 +127,26 @@ export default function AdminResources() {
                 <tbody>
                   {requests.map(req => (
                     <tr key={req.id} className="premium-row">
-                      <td><span className="resource-name">{req.requesterName}</span></td>
-                      <td><span className="slot-pill">{req.type}</span></td>
-                      <td><span className="date-tag">{req.description}</span></td>
+                      <td><span className="resource-name" style={{ fontSize: "11px" }}>{req.requesterName}</span></td>
+                      <td><span className="slot-pill" style={{ fontSize: "10px" }}>{req.type}</span></td>
+                      <td><span className="date-tag" style={{ fontSize: "10px" }}>{req.date || "—"}</span></td>
+                      <td><span className="slot-pill" style={{ fontSize: "10px" }}>{req.startTime || "—"} - {req.endTime || "—"}</span></td>
+                      <td><span className="date-tag" style={{ fontSize: "10px", maxWidth: "100px", overflow: "hidden", textOverflow: "ellipsis", display: "inline-block", whiteSpace: "nowrap" }}>{req.description}</span></td>
                       <td>
                         {req.status === "PENDING" ? (
-                          <div style={{ display: "flex", gap: "8px" }}>
-                            <button className="premium-cta-btn" style={{ padding: "6px 12px", fontSize: "11px" }} onClick={() => handleRequestAction(req.id, "APPROVED")}>Approve</button>
-                            <button className="cancel-btn" style={{ padding: "6px 12px", fontSize: "11px" }} onClick={() => handleRequestAction(req.id, "REJECTED")}>Reject</button>
+                          <div style={{ display: "flex", gap: "5px" }}>
+                            <button className="premium-cta-btn" style={{ padding: "4px 8px", fontSize: "10px" }} onClick={() => handleRequestAction(req.id, "APPROVED")}>Approve</button>
+                            <button className="cancel-btn" style={{ padding: "4px 8px", fontSize: "10px" }} onClick={() => handleRequestAction(req.id, "REJECTED")}>Reject</button>
                           </div>
                         ) : (
-                          <span className={`status-pill ${req.status.toLowerCase()}`}>{req.status}</span>
+                          <span className={`status-pill ${req.status.toLowerCase()}`} style={{ fontSize: "10px" }}>{req.status}</span>
                         )}
                       </td>
                     </tr>
                   ))}
                   {requests.length === 0 && !loading && (
                     <tr>
-                      <td colSpan="4">
+                      <td colSpan="6">
                         <div className="empty-state">
                           <div className="empty-icon">📁</div>
                           <h4>No pending requests</h4>
