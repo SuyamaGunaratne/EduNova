@@ -1,9 +1,12 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, useCallback, useRef } from "react";
 import api from "../api/axiosClient";
+import { useToast } from "./ToastContext";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
+  const { addToast } = useToast();
+  const loginToastRef = useRef(null);
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [user, setUser] = useState(() => {
     const raw = localStorage.getItem("user");
@@ -39,7 +42,7 @@ export function AuthProvider({ children }) {
     }
   }, [roleRequest]);
 
-  const fetchMe = async () => {
+  const fetchMe = useCallback(async () => {
     setLoading(true);
     try {
       const res = await api.get("/api/auth/me");
@@ -48,26 +51,35 @@ export function AuthProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const loginWithToken = (newToken) => {
+  const loginWithToken = useCallback((newToken) => {
     setToken(newToken);
     localStorage.setItem("token", newToken);
-  };
 
-  const logout = (confirmLogout = true) => {
+    if (loginToastRef.current === newToken) {
+      return;
+    }
+
+    loginToastRef.current = newToken;
+    addToast("Logged in successfully", "success");
+  }, [addToast]);
+
+  const logout = useCallback((confirmLogout = true) => {
     if (confirmLogout && !window.confirm("Are you sure you want to log out of the system?")) {
       return false;
     }
 
+    loginToastRef.current = null;
     setToken("");
     setUser(null);
     setRoleRequest(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("roleRequest");
+    addToast("Logged out successfully", "success");
     return true;
-  };
+  }, [addToast]);
 
   const value = useMemo(
     () => ({

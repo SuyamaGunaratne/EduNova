@@ -8,14 +8,14 @@ export default function AdminNavbar({ activeMenu }) {
   const { user, logout } = useAuth();
 
   const lastPathSegment = location.pathname.split("/").filter(Boolean).pop();
-  const resolvedActiveMenu = activeMenu || (lastPathSegment === "dashboard" || lastPathSegment === "resources" || lastPathSegment === "bookings" || lastPathSegment === "tickets" || lastPathSegment === "notifications" || lastPathSegment === "role-requests" ? lastPathSegment : "dashboard");
+  const resolvedActiveMenu = activeMenu || (lastPathSegment === "dashboard" || lastPathSegment === "resources" || lastPathSegment === "bookings" || lastPathSegment === "tickets" || lastPathSegment === "role-requests" ? lastPathSegment : "dashboard");
 
   const navLinkClass = (menuKey) =>
     `user-nav-link${resolvedActiveMenu === menuKey ? " active" : ""}`;
 
   const onLogout = () => {
     if (logout()) {
-      navigate("/login", { replace: true });
+      navigate("/", { replace: true });
     }
   };
 

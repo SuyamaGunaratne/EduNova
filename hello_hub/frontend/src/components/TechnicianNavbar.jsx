@@ -12,8 +12,7 @@ export default function TechnicianNavbar({ activeMenu }) {
     activeMenu ||
     (
     lastPathSegment === "resources" ||
-    lastPathSegment === "tickets" ||
-    lastPathSegment === "notifications"
+    lastPathSegment === "tickets"
       ? lastPathSegment
       : "tickets");
 

@@ -6,10 +6,10 @@ export default function AuthCallbackPage() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const { loginWithToken, fetchMe } = useAuth();
+  const token = params.get("token");
 
   useEffect(() => {
     const completeLogin = async () => {
-      const token = params.get("token");
       console.log("JWT Token: ", token);
 
       if (!token) {
@@ -29,10 +29,10 @@ export default function AuthCallbackPage() {
     };
 
     completeLogin();
-  }, [params, navigate, loginWithToken, fetchMe]);
+  }, [token, navigate, loginWithToken, fetchMe]);
 
   return (
-    <div className="page hero-bg">
+    <div className="page">
       <div className="glass-card">
         <h2>Finishing authentication...</h2>
       </div>

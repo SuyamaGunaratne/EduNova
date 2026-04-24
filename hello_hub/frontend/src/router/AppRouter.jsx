@@ -14,17 +14,13 @@ import Userbookings from "../pages/Userbookings";
 import UserHome from "../pages/UserHome";
 import UserLayout from "../pages/UserLayout";
 import AdminLayout from "../pages/AdminLayout";
-import UserNotifications from "../pages/UserNotifications";
 import UserResources from "../pages/UserResources";
 import UserTickets from "../pages/UserTickets";
 import AdminBookings from "../pages/AdminBookings";
 import AdminResources from "../pages/AdminResources";
 import AdminTicket from "../pages/AdminTicket";
-import AdminNotification from "../pages/AdminNotification";
 import TechnicianLayout from "../pages/TechnianLayout";
-import TechnicianNavbar from "../components/TechnicianNavbar";
 import TechnianTickets from "../pages/TechnianTickets";
-import TechnianNotification from "../pages/TechnianNotification";
 import ExternalLayout from "../pages/ExternalLayout";
 import ExternalDashboard from "../pages/ExternalDashboard";
 
@@ -79,7 +75,6 @@ export default function AppRouter() {
         <Route path="resources" element={<AdminResources />} />
         <Route path="bookings" element={<AdminBookings />} />
         <Route path="tickets" element={<AdminTicket />} />
-        <Route path="notifications" element={<AdminNotification />} />
         <Route path="role-requests" element={<AdminRoleRequests />} />
       </Route>
 
@@ -95,7 +90,6 @@ export default function AppRouter() {
         <Route path="resources" element={<UserResources />} />
         <Route path="bookings" element={<Userbookings />} />
         <Route path="tickets" element={<UserTickets />} />
-        <Route path="notifications" element={<UserNotifications />} />
       </Route>
 
       <Route
@@ -110,7 +104,6 @@ export default function AppRouter() {
         <Route path="resources" element={<UserResources />} />
         <Route path="bookings" element={<Userbookings />} />
         <Route path="tickets" element={<UserTickets />} />
-        <Route path="notifications" element={<UserNotifications />} />
       </Route>
 
       <Route
@@ -124,7 +117,6 @@ export default function AppRouter() {
         <Route index element={<TechnianTickets />} />
         <Route path="tickets" element={<TechnianTickets />} />
         <Route path="resources" element={<UserResources />} />
-        <Route path="notifications" element={<TechnianNotification />} />
       </Route>
 
       <Route
