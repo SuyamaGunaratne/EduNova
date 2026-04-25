@@ -6,6 +6,9 @@ export default function UserResources() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("ALL");
+  const [selectedType, setSelectedType] = useState("ALL");
   const [formData, setFormData] = useState({ 
     description: "", 
     type: "PROJECTOR",
@@ -83,6 +86,20 @@ export default function UserResources() {
     }
   };
 
+  const getFilteredRequests = () => {
+    return requests.filter(req => {
+      const matchesSearch = 
+        req.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        req.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        req.date.includes(searchTerm);
+      
+      const matchesStatus = selectedStatus === "ALL" || req.status === selectedStatus;
+      const matchesType = selectedType === "ALL" || req.type === selectedType;
+      
+      return matchesSearch && matchesStatus && matchesType;
+    });
+  };
+
   return (
     <div className="page mesh-bg dashboard-fade-in">
       <div className="dashboard-shell">
@@ -105,6 +122,74 @@ export default function UserResources() {
             <h3>Request History</h3>
           </div>
 
+          {/* Search and Filter Bar */}
+          <div className="search-filter-bar">
+            <div className="search-container">
+              <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+              </svg>
+              <input 
+                type="text"
+                className="search-input"
+                placeholder="Search by description, resource type, or date..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+
+            <div className="filter-controls">
+              <div className="filter-group">
+                <label className="filter-label">Status:</label>
+                <select 
+                  className="filter-select"
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                >
+                  <option value="ALL">All Status</option>
+                  <option value="PENDING">Pending</option>
+                  <option value="APPROVED">Approved</option>
+                  <option value="REJECTED">Rejected</option>
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label className="filter-label">Resource Type:</label>
+                <select 
+                  className="filter-select"
+                  value={selectedType}
+                  onChange={(e) => setSelectedType(e.target.value)}
+                >
+                  <option value="ALL">All Types</option>
+                  <option value="PROJECTOR">Projector</option>
+                  <option value="LAPTOP">Laptop</option>
+                  <option value="SETUP">Full PC Setup</option>
+                  <option value="LAB">Laboratory Space</option>
+                  <option value="SOFTWARE">Software License</option>
+                  <option value="OTHER">Other Equipment</option>
+                </select>
+              </div>
+
+              {(searchTerm || selectedStatus !== "ALL" || selectedType !== "ALL") && (
+                <button 
+                  className="reset-filters-btn"
+                  onClick={() => {
+                    setSearchTerm("");
+                    setSelectedStatus("ALL");
+                    setSelectedType("ALL");
+                  }}
+                >
+                  Clear Filters
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Results Count */}
+          <div className="results-info">
+            <p className="results-count">Showing {getFilteredRequests().length} of {requests.length} requests</p>
+          </div>
+
           <div className="table-container">
             <table className="premium-table">
               <thead>
@@ -118,7 +203,7 @@ export default function UserResources() {
                 </tr>
               </thead>
               <tbody>
-                {requests.map(req => (
+                {getFilteredRequests().map(req => (
                   <tr key={req.id} className="premium-row">
                     <td>
                       <div className="resource-cell">
@@ -163,13 +248,13 @@ export default function UserResources() {
                     </td>
                   </tr>
                 ))}
-                {requests.length === 0 && !loading && (
+                {getFilteredRequests().length === 0 && !loading && (
                   <tr>
                     <td colSpan="6">
                       <div className="empty-state">
                         <div className="empty-icon">📂</div>
-                        <h4>No requests found</h4>
-                        <p>Submit a new request to see it here.</p>
+                        <h4>{requests.length === 0 ? "No requests found" : "No matching requests"}</h4>
+                        <p>{requests.length === 0 ? "Submit a new request to see it here." : "Try adjusting your search or filter options."}</p>
                       </div>
                     </td>
                   </tr>

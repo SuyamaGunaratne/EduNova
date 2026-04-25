@@ -41,8 +41,22 @@ public class AuthController {
     @PostMapping("/select-role")
     public ResponseEntity<?> selectRole(Authentication authentication,
                                         @Valid @RequestBody RoleSelectionRequest request) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body(Map.of(
+                    "error", "Unauthorized",
+                    "message", "Authentication required"
+            ));
+        }
+
         String userEmail = authentication.getName();
         AppUser user = userService.getByEmail(userEmail);
+        
+        if (user == null) {
+            return ResponseEntity.status(400).body(Map.of(
+                    "error", "Bad Request",
+                    "message", "User not found. Please complete OAuth registration first."
+            ));
+        }
 
         // Create a role request instead of directly assigning
         RoleRequest roleRequest = roleRequestService.createRoleRequest(userEmail, request.role());
