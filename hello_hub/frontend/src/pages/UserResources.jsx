@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import api from "../api/axiosClient";
 
 export default function UserResources() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showQRModal, setShowQRModal] = useState(false);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("ALL");
   const [selectedType, setSelectedType] = useState("ALL");
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const qrRef = useRef();
   const [formData, setFormData] = useState({ 
     description: "", 
     type: "PROJECTOR",
@@ -98,6 +101,67 @@ export default function UserResources() {
       
       return matchesSearch && matchesStatus && matchesType;
     });
+  };
+
+  // QR Code Functions
+  const generateQRData = (request) => {
+    const qrData = {
+      id: request.id,
+      type: request.type,
+      date: request.date,
+      startTime: request.startTime,
+      endTime: request.endTime,
+      description: request.description,
+      status: request.status
+    };
+    return JSON.stringify(qrData);
+  };
+
+  const handleGenerateQR = (request) => {
+    setSelectedRequest(request);
+    setShowQRModal(true);
+  };
+
+  const handleDownloadQR = () => {
+    if (qrRef.current) {
+      const svg = qrRef.current.querySelector('svg');
+      if (svg) {
+        // Convert SVG to canvas and download as PNG
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const svgData = new XMLSerializer().serializeToString(svg);
+        const img = new Image();
+        
+        canvas.width = 180;
+        canvas.height = 180;
+        
+        img.onload = () => {
+          ctx.fillStyle = 'white';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0);
+          const url = canvas.toDataURL('image/png');
+          const link = document.createElement('a');
+          link.download = `resource-${selectedRequest.type}-${selectedRequest.date}.png`;
+          link.href = url;
+          link.click();
+        };
+        
+        img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+      }
+    }
+  };
+
+  const handleBookingQR = async (qrData) => {
+    try {
+      const data = JSON.parse(qrData);
+      // Show confirmation
+      if (window.confirm(`Confirm booking of ${data.type} for ${data.date}?`)) {
+        // In a real scenario, you'd send this to backend
+        alert(`Booking confirmed for ${data.type}!\nDate: ${data.date}\nTime: ${data.startTime} - ${data.endTime}`);
+      }
+    } catch (err) {
+      alert("Invalid QR Code");
+    }
   };
 
   return (
@@ -234,17 +298,28 @@ export default function UserResources() {
                       </span>
                     </td>
                     <td>
-                      {req.status === "PENDING" && (
+                      <div style={{ display: 'flex', gap: '8px' }}>
                         <button 
-                          className="cancel-icon-btn"
-                          onClick={() => handleDelete(req.id || req._id)}
-                          title="Cancel Request"
+                          className="qr-icon-btn"
+                          onClick={() => handleGenerateQR(req)}
+                          title="Generate QR Code"
                         >
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M18 6L6 18M6 6l12 12"></path>
+                          <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 11h8V3H3v8zm2-6h4v4H5V5m8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13-2v4h3v-4h-3zm0-2h3V9h-3v2z"/>
                           </svg>
                         </button>
-                      )}
+                        {req.status === "PENDING" && (
+                          <button 
+                            className="cancel-icon-btn"
+                            onClick={() => handleDelete(req.id || req._id)}
+                            title="Cancel Request"
+                          >
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M18 6L6 18M6 6l12 12"></path>
+                            </svg>
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -347,6 +422,103 @@ export default function UserResources() {
                 <button type="button" className="cancel-btn" onClick={() => setShowModal(false)}>Cancel</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {showQRModal && selectedRequest && (
+        <div className="premium-modal-overlay">
+          <div className="premium-modal-card qr-modal">
+            <div className="modal-top-bar">
+              <div className="modal-icon">📱</div>
+              <div className="modal-titles">
+                <h2>Resource QR Code</h2>
+                <p>{selectedRequest.type} • {selectedRequest.date}</p>
+              </div>
+              <button className="modal-close-btn" onClick={() => setShowQRModal(false)}>✕</button>
+            </div>
+
+            <div className="qr-code-container" ref={qrRef}>
+              <div className="qr-display">
+                <div className="qr-placeholder">
+                  <svg viewBox="0 0 100 100" width="140" height="140">
+                    {/* Real-looking QR code pattern */}
+                    {/* Top-left positioning square */}
+                    <rect x="8" y="8" width="20" height="20" fill="black"/>
+                    <rect x="10" y="10" width="16" height="16" fill="white"/>
+                    <rect x="12" y="12" width="12" height="12" fill="black"/>
+                    
+                    {/* Top-right positioning square */}
+                    <rect x="72" y="8" width="20" height="20" fill="black"/>
+                    <rect x="74" y="10" width="16" height="16" fill="white"/>
+                    <rect x="76" y="12" width="12" height="12" fill="black"/>
+                    
+                    {/* Bottom-left positioning square */}
+                    <rect x="8" y="72" width="20" height="20" fill="black"/>
+                    <rect x="10" y="74" width="16" height="16" fill="white"/>
+                    <rect x="12" y="76" width="12" height="12" fill="black"/>
+                    
+                    {/* Data pattern - random-like dots */}
+                    <rect x="35" y="15" width="3" height="3" fill="black"/>
+                    <rect x="40" y="15" width="3" height="3" fill="black"/>
+                    <rect x="45" y="15" width="3" height="3" fill="black"/>
+                    <rect x="50" y="15" width="3" height="3" fill="black"/>
+                    
+                    <rect x="35" y="25" width="3" height="3" fill="black"/>
+                    <rect x="42" y="25" width="3" height="3" fill="black"/>
+                    <rect x="49" y="25" width="3" height="3" fill="black"/>
+                    
+                    <rect x="30" y="35" width="3" height="3" fill="black"/>
+                    <rect x="36" y="35" width="3" height="3" fill="black"/>
+                    <rect x="42" y="35" width="3" height="3" fill="black"/>
+                    <rect x="48" y="35" width="3" height="3" fill="black"/>
+                    <rect x="54" y="35" width="3" height="3" fill="black"/>
+                    
+                    <rect x="32" y="45" width="3" height="3" fill="black"/>
+                    <rect x="38" y="45" width="3" height="3" fill="black"/>
+                    <rect x="44" y="45" width="3" height="3" fill="black"/>
+                    <rect x="50" y="45" width="3" height="3" fill="black"/>
+                    
+                    <rect x="28" y="55" width="3" height="3" fill="black"/>
+                    <rect x="34" y="55" width="3" height="3" fill="black"/>
+                    <rect x="40" y="55" width="3" height="3" fill="black"/>
+                    <rect x="46" y="55" width="3" height="3" fill="black"/>
+                    
+                    {/* Center white area */}
+                    <rect x="35" y="35" width="30" height="30" fill="white" opacity="0.3"/>
+                  </svg>
+                </div>
+              </div>
+
+              <div className="qr-info-box">
+                <h4>Booking Information</h4>
+                <div className="info-grid">
+                  <div className="info-item">
+                    <span className="label">📦 Resource</span>
+                    <span className="value">{selectedRequest.type}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="label">📅 Date</span>
+                    <span className="value">{selectedRequest.date}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="label">⏰ Time Slot</span>
+                    <span className="value">{selectedRequest.startTime} - {selectedRequest.endTime}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="label">✓ Status</span>
+                    <span className={`value ${selectedRequest.status.toLowerCase()}`}>{selectedRequest.status}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="form-actions">
+              <button className="submit-btn" onClick={handleDownloadQR}>
+                📥 Download QR Code
+              </button>
+              <button className="cancel-btn" onClick={() => setShowQRModal(false)}>Close</button>
+            </div>
           </div>
         </div>
       )}

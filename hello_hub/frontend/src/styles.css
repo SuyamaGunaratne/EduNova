@@ -3085,6 +3085,157 @@ p {
   padding: 40px 20px;
 }
 
+/* QR Code Styles */
+.qr-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--purple);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.qr-icon-btn:hover {
+  background: var(--purple);
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.qr-icon-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.qr-modal {
+  max-width: 340px;
+}
+
+.qr-code-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+}
+
+.qr-display {
+  background: linear-gradient(135deg, #fafbff 0%, #f5f7ff 100%);
+  padding: 12px;
+  border-radius: 20px;
+  box-shadow: inset 0 2px 8px rgba(27, 43, 82, 0.05);
+  border: 2px solid rgba(139, 92, 246, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.qr-display::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.05), transparent 50%);
+  pointer-events: none;
+}
+
+.qr-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 220px;
+  height: 220px;
+  position: relative;
+  z-index: 1;
+}
+
+.qr-placeholder svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 4px 12px rgba(139, 92, 246, 0.2));
+}
+
+.qr-info-box {
+  background: linear-gradient(135deg, #fafbff 0%, #f5f7ff 100%);
+  padding: 12px;
+  border-radius: 18px;
+  border: 2px solid rgba(139, 92, 246, 0.12);
+  box-shadow: inset 0 2px 8px rgba(27, 43, 82, 0.05);
+}
+
+.qr-info-box h4 {
+  margin: 0 0 12px 0;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--ink);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qr-info-box h4::before {
+  content: "";
+  width: 4px;
+  height: 4px;
+  background: var(--purple);
+  border-radius: 50%;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.info-item .label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.info-item .value {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.info-item .value.pending {
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.info-item .value.approved {
+  background: linear-gradient(135deg, #2dd4bf, #14b8a6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.info-item .value.rejected {
+  background: linear-gradient(135deg, #ff6b6b, #ff4757);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* Modal Styling - Dark Mode */
 .premium-modal-overlay {
   position: fixed;
